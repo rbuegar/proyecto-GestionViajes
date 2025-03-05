@@ -32,6 +32,11 @@
   <ion-button (click)="clicBotonGuardar()">{{ isNew ? 'Guardar' : 'Modificar' }} viaje</ion-button>
   <ion-button *ngIf="!isNew" (click)="clicBotonBorrar()">Borrar viaje</ion-button>
   <ion-button color="medium" (click)="clicBotonCancelar()">Cancelar</ion-button>
+  <br><br>
+  <ion-button (click)="seleccionarImagen()">Seleccionar Imagen</ion-button>
+  <ion-button (click)="subirImagen()">Subir Imagen</ion-button>
+  <ion-button (click)="eliminarArchivo(imageSelect)">Eliminar Imagen</ion-button>
+
 </ion-content>
 
 

@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FirestoreService } from '../firestore.service';
 import { Viajes } from '../viajes';
 import { AlertController } from '@ionic/angular';
+import { LoadingController ,ToastController } from '@ionic/angular';
+import { ImagePicker } from '@awesome-cordova-plugins/image-picker/ngx';
 
 @Component({
   selector: 'app-detalle',
@@ -14,8 +16,15 @@ export class DetallePage implements OnInit {
   id: string;
   viaje: Viajes;
   isNew: boolean;
+  imageSelect: string = '';
 
-  constructor(private activatedRoute: ActivatedRoute, private firestoreService: FirestoreService, private router: Router, private alertController: AlertController) {}
+  constructor(private activatedRoute: ActivatedRoute,
+     private firestoreService: FirestoreService,
+      private router: Router,
+       private alertController: AlertController,
+      private toastController: ToastController,
+      private loadingController: LoadingController,
+    private imagePicker: ImagePicker) {}
 
   ngOnInit() {
     let idRecibido = this.activatedRoute.snapshot.paramMap.get('id');
@@ -77,4 +86,73 @@ export class DetallePage implements OnInit {
   clicBotonCancelar() {
     this.router.navigate(['/home']);
   }
+
+  async seleccionarImagen() {
+
+    this.imagePicker.hasReadPermission().then(
+      (result) => {
+        if (result === false) {
+          this.imagePicker.requestReadPermission();
+        }
+        else {
+          this.imagePicker.getPictures({
+            maximumImagesCount: 1,
+            outputType: 1
+        }).then((results) => {
+          if (results.length > 0) {
+            this.imageSelect = 'data:image/jpeg;base64,' + results[0];
+            console.log("Imagen seleccionada : " + this.imageSelect);
+      }
+    }, (err) => {
+      console.log(err);
+    }
+        );
+      }
+    }, (err) => { console.log(err); }
+    );
+  }
+
+  async subirImagen() {
+
+    const loading = await this.loadingController.create({
+      message: 'Subiendo imagen...',
+    });
+
+    const toast = await this.toastController.create({
+      message: 'Imagen subida correctamente',
+      duration: 2000
+    });
+
+    let nombreCarpeta = 'imagenes';
+
+    loading.present();
+
+    let nombreImagen = `${new Date().getTime()}`;
+
+    this.firestoreService.subirImagenBase64(nombreCarpeta, nombreImagen, this.imageSelect)
+    .then(snapshot => {
+      snapshot.ref.getDownloadURL()
+      .then(downloadURL => {
+        console.log(`Imagen disponible en: ${downloadURL}`);
+       toast.present();
+       loading.dismiss();
+      })
+    })
+  }
+
+  async eliminarArchivo(fileURL:string) {
+  const toast = await this.toastController.create({
+    message: 'Imagen eliminada correctamente',
+    duration: 2000
+  });
+
+  this.firestoreService.eliminarArchivoPorURL(fileURL).then(() => {
+    toast.present();
+  }, (error) => { 
+    console.log(error);
+  });
+}
+  
+
+
 }

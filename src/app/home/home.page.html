@@ -1,0 +1,39 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Viajes
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>LISTA DE VIAJES</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let documentViajes of arrayViajes" (click)="selectViaje(documentViajes.id)">
+          <ion-grid>
+            <ion-row>
+              <h2 style="font-size: 1.5em;">
+                {{ documentViajes.data.nombre }}
+              </h2>
+            </ion-row>
+            <ion-row>
+              <p style="font-size: 1.2em;">{{ documentViajes.data.ubicacion }}</p>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="navigateToAdd()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-alert></ion-alert>
+</ion-content>
